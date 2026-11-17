@@ -1,0 +1,785 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101114">
+<title>PHOTO STUDIO PRO</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ background:#101114;
+ color:white;
+ font-family:Arial,sans-serif;
+ padding-bottom:85px;
+}
+
+header{
+ padding:20px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ border-bottom:1px solid #303037;
+}
+
+.logo{font-size:20px;font-weight:bold}
+.logo span{color:#d5ad70}
+
+main{max-width:650px;margin:auto;padding:18px}
+h2{margin-bottom:5px}
+.sub{color:#999;font-size:13px}
+
+.panel{
+ background:#1c1d22;
+ padding:16px;
+ border-radius:17px;
+ margin:20px 0;
+}
+
+.camera-box{
+ position:relative;
+ background:#000;
+ border-radius:13px;
+ overflow:hidden;
+}
+
+video{
+ width:100%;
+ display:block;
+ background:#000;
+ min-height:220px;
+ object-fit:contain;
+}
+
+.camera-label{
+ position:absolute;
+ top:12px;
+ left:12px;
+ background:#0009;
+ padding:8px 12px;
+ border-radius:20px;
+ font-size:11px;
+}
+
+/* BOTÃO DISCRETO PARA TROCAR A CÂMERA */
+.camera-switch{
+ position:absolute;
+ right:12px;
+ bottom:12px;
+ width:40px;
+ height:40px;
+ padding:0;
+ border-radius:50%;
+ background:rgba(20,20,20,.58);
+ color:white;
+ border:1px solid rgba(255,255,255,.28);
+ font-size:21px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ backdrop-filter:blur(8px);
+ -webkit-backdrop-filter:blur(8px);
+ cursor:pointer;
+ z-index:2;
+}
+
+.camera-switch:active{
+ transform:scale(.92);
+}
+
+.controls{
+ display:flex;
+ gap:9px;
+ margin-top:12px;
+}
+
+button{
+ border:0;
+ border-radius:11px;
+ padding:14px;
+ font-weight:bold;
+ cursor:pointer;
+}
+
+.controls button{flex:1}
+.gold{background:#d5ad70;color:#111}
+.dark{background:#303137;color:white}
+button:disabled{opacity:.4}
+
+.filter-options{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin-top:15px;
+}
+
+.filter-option{
+ background:#303137;
+ color:white;
+ padding:15px 8px;
+ border:2px solid transparent;
+ text-align:center;
+}
+
+.filter-option.active{
+ border-color:#d5ad70;
+ background:#423b30;
+}
+
+.filter-option strong{
+ display:block;
+ margin-bottom:6px;
+}
+
+.filter-option small{
+ color:#bbb;
+ font-size:11px;
+ font-weight:normal;
+}
+
+.intensity{margin-top:20px}
+
+.intensity label{
+ display:flex;
+ justify-content:space-between;
+ font-size:13px;
+ margin-bottom:10px;
+}
+
+input[type=range]{
+ width:100%;
+ accent-color:#d5ad70;
+}
+
+.info{
+ font-size:12px;
+ color:#a9c9ae;
+ margin-top:12px;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,1fr);
+ gap:10px;
+ margin-top:20px;
+}
+
+.photo{
+ background:#292a30;
+ border-radius:12px;
+ overflow:hidden;
+ position:relative;
+}
+
+.photo img{
+ width:100%;
+ aspect-ratio:1;
+ object-fit:cover;
+ display:block;
+}
+
+.photo-info{
+ padding:10px;
+ font-size:11px;
+ color:#ccc;
+}
+
+.photo-actions{
+ display:flex;
+ gap:5px;
+ padding:0 8px 8px;
+}
+
+.photo-actions button{
+ flex:1;
+ padding:9px 4px;
+ font-size:11px;
+}
+
+.page{display:none}
+.page.active{display:block}
+
+nav{
+ position:fixed;
+ bottom:0;
+ left:0;
+ right:0;
+ background:#191a1f;
+ border-top:1px solid #333;
+ display:flex;
+ justify-content:space-around;
+ padding:12px;
+ z-index:10;
+}
+
+nav button{
+ background:none;
+ color:#999;
+ font-size:11px;
+}
+
+nav button.active{color:#d5ad70}
+nav span{display:block;font-size:21px;margin-bottom:4px}
+
+.empty{
+ color:#888;
+ text-align:center;
+ padding:35px 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">PHOTO <span>STUDIO PRO</span></div>
+ <div style="font-size:11px;color:#d5ad70">PRO CAMERA</div>
+</header>
+
+<main>
+
+<section id="cameraPage" class="page active">
+
+<h2>Câmera profissional</h2>
+<p class="sub">Escolha seu estilo e fotografe.</p>
+
+<div class="panel">
+
+<div class="camera-box">
+
+<video id="video" autoplay muted playsinline></video>
+
+<div class="camera-label" id="liveLabel">
+SAMSUNG GALAXY S
+</div>
+
+<!-- BOTÃO DISCRETO DE ALTERNÂNCIA -->
+<button
+ class="camera-switch"
+ onclick="switchCamera()"
+ title="Trocar câmera"
+ aria-label="Alternar entre câmera frontal e traseira">
+ ↻
+</button>
+
+</div>
+
+<div class="controls">
+<button class="gold" onclick="startCamera()">Abrir câmera</button>
+<button class="dark" onclick="stopCamera()">Desligar</button>
+</div>
+
+<p class="info" id="cameraInfo">
+Aguardando câmera.
+</p>
+
+</div>
+
+<div class="panel">
+
+<h3>Escolha seu filtro</h3>
+
+<div class="filter-options">
+
+<button class="filter-option active"
+onclick="selectStyle('samsung',this)">
+<strong>📱 Samsung Galaxy S</strong>
+<small>Vibrante, HDR e contraste definido</small>
+</button>
+
+<button class="filter-option"
+onclick="selectStyle('iphone',this)">
+<strong>🍎 iPhone</strong>
+<small>Natural, equilibrado e suave</small>
+</button>
+
+</div>
+
+<div class="intensity">
+<label>
+Intensidade do filtro
+<span id="intensityValue">70%</span>
+</label>
+
+<input
+type="range"
+id="intensity"
+min="0"
+max="100"
+value="70"
+oninput="applyLiveFilter()">
+</div>
+
+<div class="info">
+O filtro selecionado será aplicado à fotografia antes de ela ser salva.
+</div>
+
+<div class="controls">
+<button class="gold"
+id="captureBtn"
+onclick="takePhoto()"
+disabled>
+◉ FOTOGRAFAR
+</button>
+</div>
+
+</div>
+</section>
+
+<section id="galleryPage" class="page">
+
+<h2>Minha galeria</h2>
+<p class="sub">Suas fotografias salvas automaticamente.</p>
+
+<div id="gallery" class="grid"></div>
+
+<div id="emptyGallery" class="empty">
+📷<br><br>
+Suas fotografias aparecerão aqui.
+</div>
+
+</section>
+
+</main>
+
+<nav>
+<button class="active" onclick="showPage('cameraPage',this)">
+<span>📷</span>Câmera
+</button>
+
+<button onclick="showPage('galleryPage',this)">
+<span>▦</span>Galeria
+</button>
+</nav>
+
+<script>
+
+// ELEMENTOS DA PÁGINA
+const video = document.getElementById("video");
+const captureBtn = document.getElementById("captureBtn");
+const cameraInfo = document.getElementById("cameraInfo");
+const liveLabel = document.getElementById("liveLabel");
+const gallery = document.getElementById("gallery");
+const emptyGallery = document.getElementById("emptyGallery");
+const intensityValue = document.getElementById("intensityValue");
+
+// BANCO DE DADOS
+let db;
+
+const openDB = indexedDB.open("PhotoStudioProDB",1);
+
+openDB.onupgradeneeded = e => {
+ const database = e.target.result;
+ database.createObjectStore("photos",{
+  keyPath:"id",
+  autoIncrement:true
+ });
+};
+
+openDB.onsuccess = e => {
+ db = e.target.result;
+ loadGallery();
+};
+
+openDB.onerror = () => {
+ alert("Erro ao iniciar a galeria.");
+};
+
+// VARIÁVEIS
+let stream = null;
+let facing = "environment";
+let selectedStyle = "samsung";
+let intensity = 70;
+let busy = false;
+
+// CÂMERA
+async function startCamera(){
+
+ try{
+
+ if(!navigator.mediaDevices?.getUserMedia){
+  throw new Error("A câmera exige HTTPS e um navegador compatível.");
+ }
+
+ stopCamera();
+
+ stream = await navigator.mediaDevices.getUserMedia({
+  audio:false,
+  video:{
+   facingMode:{ideal:facing},
+   width:{ideal:3840},
+   height:{ideal:2160},
+   frameRate:{ideal:30,max:60}
+  }
+ });
+
+ video.srcObject = stream;
+ await video.play();
+
+ captureBtn.disabled = false;
+
+ const settings = stream.getVideoTracks()[0].getSettings();
+
+ cameraInfo.textContent =
+ "Resolução disponível: "+
+ (settings.width||"?")+" × "+(settings.height||"?");
+
+ applyLiveFilter();
+
+ }catch(error){
+
+ cameraInfo.textContent = "Não foi possível abrir a câmera.";
+ alert("Não foi possível abrir a câmera. Verifique as permissões e utilize HTTPS.");
+
+ }
+
+}
+
+function stopCamera(){
+
+ if(stream){
+  stream.getTracks().forEach(track=>track.stop());
+  stream=null;
+ }
+
+ video.srcObject=null;
+ captureBtn.disabled=true;
+
+}
+
+// TROCA ENTRE CÂMERA FRONTAL E TRASEIRA
+async function switchCamera(){
+
+ const previousFacing = facing;
+
+ facing = facing === "environment" ? "user" : "environment";
+
+ if(stream){
+  await startCamera();
+
+  if(!stream){
+   facing = previousFacing;
+  }
+ }else{
+  cameraInfo.textContent =
+   facing === "user"
+   ? "Câmera frontal selecionada. Toque em Abrir câmera."
+   : "Câmera traseira selecionada. Toque em Abrir câmera.";
+ }
+
+}
+
+// FILTROS
+function selectStyle(style,button){
+
+ selectedStyle = style;
+
+ document.querySelectorAll(".filter-option")
+ .forEach(b=>b.classList.remove("active"));
+
+ button.classList.add("active");
+
+ applyLiveFilter();
+}
+
+// FILTRO EM TEMPO REAL
+function applyLiveFilter(){
+
+ intensity = Number(document.getElementById("intensity").value);
+
+ intensityValue.textContent = intensity+"%";
+
+ const amount = intensity/100;
+
+ let b,c,s;
+
+ if(selectedStyle==="samsung"){
+
+  b=1.04;
+  c=1.16;
+  s=1.20;
+
+  liveLabel.textContent="SAMSUNG GALAXY S";
+
+ }else{
+
+  b=1.03;
+  c=1.06;
+  s=1.07;
+
+  liveLabel.textContent="IPHONE STYLE";
+
+ }
+
+ const brightness = 1+(b-1)*amount;
+ const contrast = 1+(c-1)*amount;
+ const saturation = 1+(s-1)*amount;
+
+ video.style.filter =
+ `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`;
+
+}
+
+// CAPTURA ORIGINAL
+async function captureOriginal(){
+
+ const track = stream.getVideoTracks()[0];
+
+ if("ImageCapture" in window){
+
+  try{
+   const imageCapture = new ImageCapture(track);
+   return await imageCapture.takePhoto();
+  }catch(error){
+   console.log("Utilizando captura alternativa.");
+  }
+
+ }
+
+ const canvas = document.createElement("canvas");
+
+ canvas.width = video.videoWidth;
+ canvas.height = video.videoHeight;
+
+ canvas.getContext("2d").drawImage(
+  video,0,0,canvas.width,canvas.height
+ );
+
+ return new Promise(resolve=>{
+  canvas.toBlob(resolve,"image/jpeg",0.98);
+ });
+
+}
+
+// APLICA FILTRO NA FOTO
+function processPhoto(blob){
+
+ return new Promise((resolve,reject)=>{
+
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+
+  img.onload = ()=>{
+
+   const canvas = document.createElement("canvas");
+
+   canvas.width = img.naturalWidth;
+   canvas.height = img.naturalHeight;
+
+   const ctx = canvas.getContext("2d");
+
+   const amount = intensity/100;
+
+   let b,c,s;
+
+   if(selectedStyle==="samsung"){
+    b=1.04;
+    c=1.16;
+    s=1.20;
+   }else{
+    b=1.03;
+    c=1.06;
+    s=1.07;
+   }
+
+   ctx.filter =
+   `brightness(${1+(b-1)*amount}) contrast(${1+(c-1)*amount}) saturate(${1+(s-1)*amount})`;
+
+   ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+   canvas.toBlob(result=>{
+
+    URL.revokeObjectURL(url);
+
+    if(result)resolve(result);
+    else reject(new Error("Falha ao processar imagem."));
+
+   },"image/jpeg",0.98);
+
+  };
+
+  img.onerror = ()=>{
+   URL.revokeObjectURL(url);
+   reject(new Error("Não foi possível carregar a fotografia."));
+  };
+
+  img.src = url;
+
+ });
+
+}
+
+// FOTOGRAFAR E SALVAR
+async function takePhoto(){
+
+ if(!stream||busy)return;
+
+ busy=true;
+ captureBtn.disabled=true;
+ captureBtn.textContent="PROCESSANDO...";
+
+ try{
+
+ const originalBlob = await captureOriginal();
+
+ if(!originalBlob)throw new Error("Captura não disponível.");
+
+ const filteredBlob = await processPhoto(originalBlob);
+
+ const record = {
+  original:originalBlob,
+  edited:filteredBlob,
+  style:selectedStyle,
+  intensity:intensity,
+  date:new Date().toISOString()
+ };
+
+ await savePhoto(record);
+ await loadGallery();
+
+ alert("Fotografia salva automaticamente na galeria!");
+
+ }catch(error){
+
+ alert("Erro ao salvar: "+error.message);
+
+ }finally{
+
+ busy=false;
+ captureBtn.disabled=!stream;
+ captureBtn.textContent="◉ FOTOGRAFAR";
+
+ }
+
+}
+
+// SALVAR NO BANCO
+function savePhoto(record){
+
+ return new Promise((resolve,reject)=>{
+
+  const tx = db.transaction("photos","readwrite");
+
+  tx.objectStore("photos").add(record);
+
+  tx.oncomplete = ()=>resolve();
+  tx.onerror = ()=>reject(tx.error);
+
+ });
+
+}
+
+// BUSCAR FOTOS
+async function getPhotos(){
+
+ return new Promise((resolve,reject)=>{
+
+  const req = db.transaction("photos","readonly")
+  .objectStore("photos").getAll();
+
+  req.onsuccess = ()=>resolve(req.result);
+  req.onerror = ()=>reject(req.error);
+
+ });
+
+}
+
+// GALERIA
+async function loadGallery(){
+
+ if(!db)return;
+
+ const photos = await getPhotos();
+
+ gallery.innerHTML = "";
+
+ emptyGallery.style.display =
+ photos.length ? "none" : "block";
+
+ photos.reverse().forEach(photo=>{
+
+  const url = URL.createObjectURL(photo.edited);
+
+  const card = document.createElement("div");
+  card.className = "photo";
+
+  const img = document.createElement("img");
+  img.src = url;
+
+  const info = document.createElement("div");
+  info.className = "photo-info";
+
+  info.textContent =
+   (photo.style==="samsung"?"Samsung Galaxy S":"iPhone")+
+   " • "+photo.intensity+"%";
+
+  const actions = document.createElement("div");
+  actions.className = "photo-actions";
+
+  const download = document.createElement("button");
+  download.className = "gold";
+  download.textContent = "Salvar";
+
+  download.onclick = ()=>{
+   downloadBlob(photo.edited,"Foto-editada.jpg");
+  };
+
+  const original = document.createElement("button");
+  original.className = "dark";
+  original.textContent = "Original";
+
+  original.onclick = ()=>{
+   downloadBlob(photo.original,"Foto-original.jpg");
+  };
+
+  actions.append(download,original);
+  card.append(img,info,actions);
+
+  gallery.appendChild(card);
+
+ });
+
+}
+
+// BAIXAR FOTOS
+function downloadBlob(blob,name){
+
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement("a");
+
+ a.href = url;
+ a.download = name;
+
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ setTimeout(()=>URL.revokeObjectURL(url),5000);
+
+}
+
+// NAVEGAÇÃO
+function showPage(id,button){
+
+ document.querySelectorAll(".page")
+ .forEach(p=>p.classList.remove("active"));
+
+ document.getElementById(id).classList.add("active");
+
+ document.querySelectorAll("nav button")
+ .forEach(b=>b.classList.remove("active"));
+
+ button.classList.add("active");
+
+ if(id==="galleryPage")loadGallery();
+
+}
+
+</script>
+
+</body>
+</html>
