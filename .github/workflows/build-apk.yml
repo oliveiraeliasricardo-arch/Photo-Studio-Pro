@@ -31,9 +31,14 @@ jobs:
         run: npm install
 
       - name: Preparar Android
+        run: npx cap add android
+
+      - name: Declarar permissão da câmera
         run: |
-          npx cap add android
-          npx cap sync android
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n</manifest>#' android/app/src/main/AndroidManifest.xml
+
+      - name: Sincronizar Capacitor
+        run: npx cap sync android
 
       - name: Gerar APK
         run: |
