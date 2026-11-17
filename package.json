@@ -1,10 +1,10 @@
 
 {
   "name": "photo-studio-pro",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
-    "build": "echo Build concluído"
+    "build": "echo Build concluido"
   },
   "dependencies": {
     "@capacitor/android": "6.2.0",
