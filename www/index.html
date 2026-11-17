@@ -6,93 +6,272 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#000000">
 <title>PHOTO STUDIO PRO</title>
+
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:white;font-family:Arial,sans-serif}
-button{border:0;color:white;background:transparent;font:inherit;cursor:pointer}
+html,body{
+ margin:0;width:100%;height:100%;overflow:hidden;
+ background:#000;color:white;font-family:Arial,sans-serif
+}
+button,select{border:0;color:white;background:transparent;font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.4}
 #app{height:100dvh;width:100%;position:relative;overflow:hidden}
 .page{display:none;position:absolute;inset:0}
 .page.active{display:block}
 #cameraPage{background:#000}
-#video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#video.mirror{transform:scaleX(-1)}
-.topbar{position:absolute;top:0;left:0;right:0;padding:40px 18px 20px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(#0009,transparent)}
+#video{
+ position:absolute;inset:0;width:100%;height:100%;
+ object-fit:cover;transform-origin:center
+}
+.topbar{
+ position:absolute;top:0;left:0;right:0;
+ padding:38px 16px 18px;display:flex;
+ justify-content:space-between;align-items:center;
+ background:linear-gradient(#0009,transparent);z-index:5
+}
 .brand{font-size:13px;font-weight:bold;letter-spacing:1px}
 .brand b{color:#d5ad70}
-.round{width:42px;height:42px;border-radius:50%;background:#2229;border:1px solid #ffffff55;font-size:20px}
-#status{position:absolute;top:90px;left:50%;transform:translateX(-50%);background:#0009;padding:7px 13px;border-radius:20px;font-size:11px;white-space:nowrap}
-#bottom{position:absolute;bottom:0;left:0;right:0;padding:15px 18px 35px;background:linear-gradient(transparent,#000d)}
-.modes{display:flex;justify-content:center;gap:25px;margin-bottom:15px;font-size:12px}
+.round{
+ width:42px;height:42px;border-radius:50%;
+ background:#2229;border:1px solid #ffffff55;font-size:20px
+}
+#status{
+ position:absolute;top:88px;left:50%;
+ transform:translateX(-50%);background:#0009;
+ padding:7px 13px;border-radius:20px;
+ font-size:11px;white-space:nowrap;z-index:5
+}
+
+/* CONTROLES SUPERIORES */
+#proControls{
+ position:absolute;top:124px;left:12px;right:12px;
+ z-index:4;display:flex;flex-direction:column;gap:8px;
+ padding:10px;border-radius:15px;background:#0009;
+ backdrop-filter:blur(9px);max-height:42vh;overflow-y:auto
+}
+.control-row{display:flex;align-items:center;gap:8px}
+.control-label{font-size:10px;color:#ddd;min-width:62px}
+.control-range{flex:1;min-width:0;accent-color:#d5ad70}
+.control-value{font-size:10px;min-width:30px;text-align:right}
+.pro-btn{
+ padding:8px 10px;border:1px solid #ffffff55;
+ border-radius:18px;background:#222b;font-size:10px
+}
+.pro-btn.active{background:#d5ad70;color:#111;font-weight:bold}
+.zoom-buttons{display:flex;justify-content:center;gap:8px}
+.zoom-buttons button{min-width:44px}
+.control-select{
+ background:#292929;border:1px solid #777;
+ border-radius:12px;padding:7px;color:white;
+ font-size:11px;max-width:110px
+}
+
+/* GRADE */
+#gridOverlay{
+ display:none;position:absolute;inset:0;z-index:2;
+ pointer-events:none;
+ background-image:
+ linear-gradient(to right,transparent 33.1%,#ffffff88 33.3%,transparent 33.5%,transparent 66.4%,#ffffff88 66.6%,transparent 66.8%),
+ linear-gradient(to bottom,transparent 33.1%,#ffffff88 33.3%,transparent 33.5%,transparent 66.4%,#ffffff88 66.6%,transparent 66.8%);
+}
+
+/* FOCO */
+#focusRing{
+ display:none;position:absolute;z-index:6;
+ width:65px;height:65px;border:2px solid #ffd76a;
+ border-radius:50%;pointer-events:none;
+ transform:translate(-50%,-50%)
+}
+
+/* TEMPORIZADOR */
+#countdown{
+ display:none;position:absolute;z-index:8;
+ top:43%;left:50%;transform:translate(-50%,-50%);
+ font-size:75px;font-weight:bold;
+ text-shadow:0 2px 15px #000
+}
+
+/* PARTE INFERIOR */
+#bottom{
+ position:absolute;bottom:0;left:0;right:0;
+ padding:12px 16px 25px;
+ background:linear-gradient(transparent,#000e);z-index:4
+}
+.modes{
+ display:flex;justify-content:center;gap:22px;
+ margin-bottom:10px;font-size:11px
+}
 .modes span{color:#bbb}
 .modes .active{color:#e8c58d;font-weight:bold}
-.filters{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
-.filter{background:#222c;border:1px solid #ffffff55;border-radius:20px;padding:10px 13px;font-size:12px}
+.filters{display:flex;justify-content:center;gap:8px;margin-bottom:9px}
+.filter{
+ background:#222c;border:1px solid #ffffff55;
+ border-radius:20px;padding:8px 11px;font-size:10px
+}
 .filter.active{background:#d5ad70;color:#111;font-weight:bold}
-.intensity{display:flex;align-items:center;gap:10px;max-width:270px;margin:0 auto 15px;font-size:10px}
-input[type=range]{width:100%;accent-color:#d5ad70}
-.capture-row{display:grid;grid-template-columns:1fr 76px 1fr;align-items:center;max-width:360px;margin:auto}
-.thumb{width:48px;height:48px;border-radius:9px;border:2px solid white;overflow:hidden;background:#222}
+.intensity{
+ display:flex;align-items:center;gap:9px;
+ max-width:270px;margin:0 auto 10px;font-size:10px
+}
+.intensity input{width:100%;accent-color:#d5ad70}
+.capture-row{
+ display:grid;grid-template-columns:1fr 76px 1fr;
+ align-items:center;max-width:360px;margin:auto
+}
+.thumb{
+ width:46px;height:46px;border-radius:9px;
+ border:2px solid white;overflow:hidden;background:#222
+}
 .thumb img{width:100%;height:100%;object-fit:cover}
-.shutter{width:72px;height:72px;border-radius:50%;border:5px solid white;background:#ffffff44;display:grid;place-items:center;justify-self:center}
-.shutter:after{content:"";width:52px;height:52px;border-radius:50%;background:white}
-.shutter:disabled{opacity:.4}
+.shutter{
+ width:70px;height:70px;border-radius:50%;
+ border:5px solid white;background:#ffffff44;
+ display:grid;place-items:center;justify-self:center
+}
+.shutter:after{
+ content:"";width:50px;height:50px;
+ border-radius:50%;background:white
+}
 .gallery-open{justify-self:end;font-size:11px}
-.gallery-open span{display:block;font-size:25px}
-#galleryPage{background:#101114;overflow:auto;padding:35px 15px}
-.gallery-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.gallery-open span{display:block;font-size:24px}
+#toast{
+ display:none;position:absolute;bottom:120px;left:50%;
+ transform:translateX(-50%);background:#222;
+ border:1px solid #555;border-radius:20px;
+ padding:12px 16px;font-size:12px;z-index:10;
+ width:max-content;max-width:90%
+}
+
+/* GALERIA */
+#galleryPage{
+ background:#101114;overflow:auto;padding:35px 15px
+}
+.gallery-head{
+ display:flex;align-items:center;
+ justify-content:space-between;margin-bottom:20px
+}
 .gallery-head h2{font-size:21px}
 .back{font-size:28px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.grid-photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .photo{background:#222;border-radius:12px;overflow:hidden}
 .photo img{width:100%;aspect-ratio:1;object-fit:cover}
 .photo-info{padding:9px;font-size:11px;color:#ccc}
 .photo-actions{display:flex;gap:5px;padding:0 8px 8px}
-.photo-actions button{flex:1;background:#444;border-radius:8px;padding:9px;font-size:11px}
+.photo-actions button{
+ flex:1;background:#444;border-radius:8px;
+ padding:9px;font-size:11px
+}
 .empty{text-align:center;color:#999;padding:50px 10px}
-#toast{display:none;position:absolute;bottom:130px;left:50%;transform:translateX(-50%);background:#222;border:1px solid #555;border-radius:20px;padding:12px 16px;font-size:12px;z-index:9;width:max-content;max-width:90%}
 </style>
 </head>
+
 <body>
 <div id="app">
 
 <section id="cameraPage" class="page active">
-<video id="video" autoplay muted playsinline></video>
 
-<div class="topbar">
- <div class="brand">PHOTO <b>STUDIO PRO</b></div>
- <button class="round" id="switchBtn">↻</button>
-</div>
+ <video id="video" autoplay muted playsinline></video>
 
-<div id="status">Iniciando câmera...</div>
+ <div id="gridOverlay"></div>
+ <div id="focusRing"></div>
+ <div id="countdown"></div>
 
-<div id="bottom">
- <div class="modes">
-  <span class="active">FOTO</span>
-  <span>RETRATO</span>
-  <span>VÍDEO</span>
+ <div class="topbar">
+  <div class="brand">PHOTO <b>STUDIO PRO</b></div>
+  <button class="round" id="switchBtn">↻</button>
  </div>
 
- <div class="filters">
-  <button class="filter active" data-style="samsung">Samsung Galaxy S</button>
-  <button class="filter" data-style="iphone">iPhone</button>
+ <div id="status">Iniciando câmera...</div>
+
+ <div id="proControls">
+
+  <div class="control-row">
+   <button class="pro-btn" id="flashBtn">⚡ Flash OFF</button>
+   <span class="control-label">ZOOM</span>
+   <span class="control-value" id="zoomValue">1.0x</span>
+  </div>
+
+  <div class="control-row">
+   <input class="control-range" id="zoomRange"
+    type="range" min="1" max="3" step="0.1" value="1">
+  </div>
+
+  <div class="zoom-buttons">
+   <button class="pro-btn active" data-zoom="1">1x</button>
+   <button class="pro-btn" data-zoom="2">2x</button>
+   <button class="pro-btn" data-zoom="3">3x</button>
+  </div>
+
+  <div class="control-row">
+   <span class="control-label">EXPOSIÇÃO</span>
+   <input class="control-range" id="exposureRange"
+    type="range" min="-2" max="2" step="0.1" value="0">
+   <span class="control-value" id="exposureValue">0</span>
+  </div>
+
+  <div class="control-row">
+   <span class="control-label">TEMPORIZADOR</span>
+   <select id="timerSelect" class="control-select">
+    <option value="0">Desligado</option>
+    <option value="3">3 segundos</option>
+    <option value="5">5 segundos</option>
+    <option value="10">10 segundos</option>
+   </select>
+
+   <button class="pro-btn" id="gridBtn">▦ Grade OFF</button>
+  </div>
+
+  <div class="control-row">
+   <span class="control-label">PROPORÇÃO</span>
+   <select id="ratioSelect" class="control-select">
+    <option value="full">Tela cheia</option>
+    <option value="4:3">4:3</option>
+    <option value="16:9">16:9</option>
+   </select>
+
+   <button class="pro-btn" id="nightBtn">☾ Noturno OFF</button>
+  </div>
+
  </div>
 
- <div class="intensity">
-  <span>FILTRO</span>
-  <input id="intensity" type="range" min="0" max="100" value="70">
-  <span id="intensityValue">70%</span>
- </div>
+ <div id="bottom">
 
- <div class="capture-row">
-  <button class="thumb" id="lastThumb">
-   <img id="lastImage" style="display:none" alt="Última foto">
-  </button>
-  <button class="shutter" id="captureBtn" disabled aria-label="Fotografar"></button>
-  <button class="gallery-open" id="openGallery">
-   <span>▦</span>GALERIA
-  </button>
+  <div class="modes">
+   <span class="active">FOTO</span>
+   <span>RETRATO</span>
+   <span>VÍDEO</span>
+  </div>
+
+  <div class="filters">
+   <button class="filter active" data-style="samsung">
+    Samsung Galaxy S
+   </button>
+   <button class="filter" data-style="iphone">
+    iPhone
+   </button>
+  </div>
+
+  <div class="intensity">
+   <span>FILTRO</span>
+   <input id="intensity" type="range" min="0" max="100" value="70">
+   <span id="intensityValue">70%</span>
+  </div>
+
+  <div class="capture-row">
+   <button class="thumb" id="lastThumb">
+    <img id="lastImage" style="display:none" alt="Última foto">
+   </button>
+
+   <button class="shutter" id="captureBtn"
+    disabled aria-label="Fotografar"></button>
+
+   <button class="gallery-open" id="openGallery">
+    <span>▦</span>GALERIA
+   </button>
+  </div>
+
  </div>
-</div>
 </section>
 
 <section id="galleryPage" class="page">
@@ -101,8 +280,11 @@ input[type=range]{width:100%;accent-color:#d5ad70}
   <h2>Minha galeria</h2>
   <span></span>
  </div>
- <div id="gallery" class="grid"></div>
- <div id="emptyGallery" class="empty">Suas fotos aparecerão aqui.</div>
+
+ <div id="gallery" class="grid-photos"></div>
+ <div id="emptyGallery" class="empty">
+  Suas fotos aparecerão aqui.
+ </div>
 </section>
 
 <div id="toast"></div>
@@ -112,45 +294,128 @@ input[type=range]{width:100%;accent-color:#d5ad70}
 import { registerPlugin } from '@capacitor/core';
 
 const GallerySaver = registerPlugin('GallerySaver');
-
 const $ = id => document.getElementById(id);
+
 const video = $('video');
 const captureBtn = $('captureBtn');
 
 let stream = null;
+let track = null;
 let facing = 'environment';
 let selectedStyle = 'samsung';
 let intensity = 70;
-let db = null;
+let exposure = 0;
+let zoom = 1;
+let maxZoom = 3;
+let hardwareZoom = false;
+let hardwareExposure = false;
+let torchOn = false;
+let nightMode = false;
+let gridOn = false;
 let busy = false;
+let db = null;
+let lastPhotoUrl = null;
 
 function toast(message) {
  const el = $('toast');
  el.textContent = message;
  el.style.display = 'block';
  clearTimeout(toast.timer);
- toast.timer = setTimeout(() => el.style.display = 'none', 2800);
+ toast.timer = setTimeout(() => {
+  el.style.display = 'none';
+ },2800);
 }
 
 function openDB() {
  return new Promise((resolve,reject) => {
   const req = indexedDB.open('PhotoStudioProDB',1);
+
   req.onupgradeneeded = e => {
-   e.target.result.createObjectStore('photos',{
-    keyPath:'id',autoIncrement:true
-   });
+   const database = e.target.result;
+   if(!database.objectStoreNames.contains('photos')) {
+    database.createObjectStore('photos',{
+     keyPath:'id',autoIncrement:true
+    });
+   }
   };
+
   req.onsuccess = () => {
    db = req.result;
    resolve();
   };
+
   req.onerror = () => reject(req.error);
  });
+}
+
+function getCapabilities() {
+ try {
+  return track?.getCapabilities
+   ? track.getCapabilities()
+   : {};
+ } catch(error) {
+  return {};
+ }
+}
+
+function stopCamera() {
+ if(track && torchOn) {
+  track.applyConstraints({
+   advanced:[{torch:false}]
+  }).catch(()=>{});
+ }
+
+ if(stream) {
+  stream.getTracks().forEach(t => t.stop());
+ }
+
+ stream = null;
+ track = null;
+ torchOn = false;
+ captureBtn.disabled = true;
+ video.srcObject = null;
+
+ $('flashBtn').textContent = '⚡ Flash OFF';
+ $('flashBtn').classList.remove('active');
+}
+
+function updatePreview() {
+ const mirror = facing === 'user' ? 'scaleX(-1) ' : '';
+ const digitalZoom = hardwareZoom ? 1 : zoom;
+ video.style.transform = mirror + `scale(${digitalZoom})`;
+}
+
+function updateFilters() {
+ const amount = intensity / 100;
+
+ const values = selectedStyle === 'samsung'
+  ? [1.04,1.16,1.20]
+  : [1.03,1.06,1.07];
+
+ const [b,c,s] = values.map(v => 1+(v-1)*amount);
+
+ const exposureBrightness =
+  hardwareExposure ? 1 : Math.pow(2,exposure);
+
+ const nightBrightness = nightMode ? 1.25 : 1;
+ const nightContrast = nightMode ? 1.12 : 1;
+
+ video.style.filter =
+  `brightness(${b*exposureBrightness*nightBrightness}) contrast(${c*nightContrast}) saturate(${s})`;
+
+ $('intensityValue').textContent = intensity+'%';
+ $('exposureValue').textContent =
+  (exposure>0?'+':'')+exposure.toFixed(1);
 }
 
 async function startCamera() {
  try {
   stopCamera();
+  $('status').textContent = 'Iniciando câmera...';
+
+  if(!navigator.mediaDevices?.getUserMedia) {
+   throw new Error('Câmera não disponível.');
+  }
 
   stream = await navigator.mediaDevices.getUserMedia({
    audio:false,
@@ -162,27 +427,41 @@ async function startCamera() {
   });
 
   video.srcObject = stream;
+  track = stream.getVideoTracks()[0];
+
   await video.play();
-  video.classList.toggle('mirror',facing === 'user');
+
+  const caps = getCapabilities();
+
+  hardwareZoom = !!caps.zoom;
+
+  maxZoom = hardwareZoom
+   ? Math.min(3,caps.zoom.max || 3)
+   : 3;
+
+  zoom = 1;
+  $('zoomRange').max = maxZoom;
+  $('zoomRange').value = 1;
+
+  if(caps.exposureCompensation) {
+   $('exposureRange').min = caps.exposureCompensation.min;
+   $('exposureRange').max = caps.exposureCompensation.max;
+  }
+
+  updatePreview();
+  updateZoomDisplay();
+  updateFilters();
+
   captureBtn.disabled = false;
+
   $('status').textContent =
    facing === 'user' ? 'Câmera frontal' : 'Câmera traseira';
 
-  applyLiveFilter();
-
  } catch(error) {
+  console.error(error);
   $('status').textContent = 'Erro ao abrir câmera';
-  toast('Verifique a permissão da câmera.');
+  toast('Não foi possível abrir a câmera. Verifique as permissões.');
  }
-}
-
-function stopCamera() {
- if(stream) {
-  stream.getTracks().forEach(track => track.stop());
-  stream = null;
- }
- video.srcObject = null;
- captureBtn.disabled = true;
 }
 
 $('switchBtn').onclick = async () => {
@@ -190,39 +469,198 @@ $('switchBtn').onclick = async () => {
  await startCamera();
 };
 
-function filterValues() {
- const amount = intensity / 100;
- const values = selectedStyle === 'samsung'
-  ? [1.04,1.16,1.20]
-  : [1.03,1.06,1.07];
+function updateZoomDisplay() {
+ $('zoomValue').textContent = zoom.toFixed(1)+'x';
+ $('zoomRange').value = zoom;
 
- return values.map(v => 1 + (v-1)*amount);
+ document.querySelectorAll('[data-zoom]').forEach(btn => {
+  btn.classList.toggle(
+   'active',
+   Number(btn.dataset.zoom) === Math.round(zoom)
+  );
+ });
 }
 
-function applyLiveFilter() {
- intensity = Number($('intensity').value);
- $('intensityValue').textContent = intensity + '%';
- const [b,c,s] = filterValues();
+async function setZoom(value) {
+ zoom = Math.max(1,Math.min(maxZoom,Number(value)));
 
- video.style.filter =
-  `brightness(${b}) contrast(${c}) saturate(${s})`;
+ if(hardwareZoom && track) {
+  try {
+   await track.applyConstraints({
+    advanced:[{zoom:zoom}]
+   });
+  } catch(error) {
+   hardwareZoom = false;
+  }
+ }
+
+ updatePreview();
+ updateZoomDisplay();
 }
 
-$('intensity').oninput = applyLiveFilter;
+$('zoomRange').oninput = e => setZoom(e.target.value);
+
+document.querySelectorAll('[data-zoom]').forEach(btn => {
+ btn.onclick = () => setZoom(btn.dataset.zoom);
+});
+
+// LANTERNA
+$('flashBtn').onclick = async () => {
+ if(!track) return;
+
+ const caps = getCapabilities();
+
+ if(!caps.torch) {
+  toast('Lanterna não suportada nesta câmera.');
+  return;
+ }
+
+ try {
+  const next = !torchOn;
+
+  await track.applyConstraints({
+   advanced:[{torch:next}]
+  });
+
+  torchOn = next;
+
+  $('flashBtn').textContent =
+   torchOn ? '⚡ Flash ON' : '⚡ Flash OFF';
+
+  $('flashBtn').classList.toggle('active',torchOn);
+
+ } catch(error) {
+  toast('Não foi possível controlar a lanterna.');
+ }
+};
+
+// EXPOSIÇÃO
+async function setExposure(value) {
+ exposure = Number(value);
+ hardwareExposure = false;
+
+ const caps = getCapabilities();
+
+ if(caps.exposureCompensation && track) {
+  try {
+   await track.applyConstraints({
+    advanced:[{exposureCompensation:exposure}]
+   });
+   hardwareExposure = true;
+  } catch(error) {
+   hardwareExposure = false;
+  }
+ }
+
+ updateFilters();
+}
+
+$('exposureRange').oninput = e => setExposure(e.target.value);
+
+// FILTROS
+$('intensity').oninput = e => {
+ intensity = Number(e.target.value);
+ updateFilters();
+};
 
 document.querySelectorAll('.filter').forEach(button => {
  button.onclick = () => {
   document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
   button.classList.add('active');
   selectedStyle = button.dataset.style;
-  applyLiveFilter();
+  updateFilters();
  };
 });
 
+// MODO NOTURNO
+$('nightBtn').onclick = () => {
+ nightMode = !nightMode;
+
+ $('nightBtn').textContent =
+  nightMode ? '☾ Noturno ON' : '☾ Noturno OFF';
+
+ $('nightBtn').classList.toggle('active',nightMode);
+ updateFilters();
+};
+
+// GRADE
+$('gridBtn').onclick = () => {
+ gridOn = !gridOn;
+
+ $('gridOverlay').style.display = gridOn ? 'block' : 'none';
+ $('gridBtn').textContent = gridOn ? '▦ Grade ON' : '▦ Grade OFF';
+ $('gridBtn').classList.toggle('active',gridOn);
+};
+
+// FOCO AO TOCAR
+video.addEventListener('click',async event => {
+ if(!track) return;
+
+ const ring = $('focusRing');
+ ring.style.left = event.clientX+'px';
+ ring.style.top = event.clientY+'px';
+ ring.style.display = 'block';
+
+ clearTimeout(ring.timer);
+ ring.timer = setTimeout(() => {
+  ring.style.display = 'none';
+ },1200);
+
+ try {
+  const caps = getCapabilities();
+
+  if(caps.focusMode?.includes('single-shot')) {
+   await track.applyConstraints({
+    advanced:[{focusMode:'single-shot'}]
+   });
+  } else if(caps.focusMode?.includes('continuous')) {
+   await track.applyConstraints({
+    advanced:[{focusMode:'continuous'}]
+   });
+  }
+ } catch(error) {
+  console.log('Foco automático não disponível.');
+ }
+});
+
+// CAPTURA COM ZOOM E PROPORÇÃO
 function capturePhoto() {
+ if(!video.videoWidth || !video.videoHeight) {
+  throw new Error('Câmera ainda não está pronta.');
+ }
+
+ const sourceW = video.videoWidth;
+ const sourceH = video.videoHeight;
+ let cropW = sourceW;
+ let cropH = sourceH;
+
+ // Zoom digital
+ if(!hardwareZoom && zoom > 1) {
+  cropW = sourceW / zoom;
+  cropH = sourceH / zoom;
+ }
+
+ // Proporção escolhida
+ const ratio = $('ratioSelect').value;
+
+ if(ratio !== 'full') {
+  const parts = ratio.split(':').map(Number);
+  const targetRatio = parts[0]/parts[1];
+  const currentRatio = cropW/cropH;
+
+  if(currentRatio > targetRatio) {
+   cropW = cropH*targetRatio;
+  } else {
+   cropH = cropW/targetRatio;
+  }
+ }
+
+ const sx = (sourceW-cropW)/2;
+ const sy = (sourceH-cropH)/2;
+
  const canvas = document.createElement('canvas');
- canvas.width = video.videoWidth;
- canvas.height = video.videoHeight;
+ canvas.width = Math.round(cropW);
+ canvas.height = Math.round(cropH);
 
  const ctx = canvas.getContext('2d');
 
@@ -231,7 +669,11 @@ function capturePhoto() {
   ctx.scale(-1,1);
  }
 
- ctx.drawImage(video,0,0,canvas.width,canvas.height);
+ ctx.drawImage(
+  video,
+  sx,sy,cropW,cropH,
+  0,0,canvas.width,canvas.height
+ );
 
  return new Promise((resolve,reject) => {
   canvas.toBlob(blob => {
@@ -241,6 +683,7 @@ function capturePhoto() {
  });
 }
 
+// PROCESSAR FOTO EDITADA
 async function processPhoto(blob) {
  const url = URL.createObjectURL(blob);
 
@@ -254,15 +697,30 @@ async function processPhoto(blob) {
   canvas.height = img.naturalHeight;
 
   const ctx = canvas.getContext('2d');
-  const [b,c,s] = filterValues();
 
-  ctx.filter = `brightness(${b}) contrast(${c}) saturate(${s})`;
+  const amount = intensity/100;
+
+  const values = selectedStyle === 'samsung'
+   ? [1.04,1.16,1.20]
+   : [1.03,1.06,1.07];
+
+  const [b,c,s] = values.map(v => 1+(v-1)*amount);
+
+  const brightness =
+   b*(hardwareExposure?1:Math.pow(2,exposure))*
+   (nightMode?1.25:1);
+
+  const contrast = c*(nightMode?1.12:1);
+
+  ctx.filter =
+   `brightness(${brightness}) contrast(${contrast}) saturate(${s})`;
+
   ctx.drawImage(img,0,0);
 
   return await new Promise((resolve,reject) => {
    canvas.toBlob(result => {
     if(result) resolve(result);
-    else reject(new Error('Falha no filtro.'));
+    else reject(new Error('Falha no tratamento da foto.'));
    },'image/jpeg',0.96);
   });
 
@@ -277,7 +735,7 @@ function blobToBase64(blob) {
   reader.onload = () => resolve(String(reader.result).split(',')[1]);
   reader.onerror = reject;
   reader.readAsDataURL(blob);
- });
+ }
 }
 
 async function saveToGallery(blob,fileName) {
@@ -294,19 +752,52 @@ async function saveToGallery(blob,fileName) {
  }
 }
 
-function saveLocal(original,edited) {
+// GALERIA INTERNA: SOMENTE FOTO EDITADA
+function saveLocal(edited) {
  return new Promise((resolve,reject) => {
   const tx = db.transaction('photos','readwrite');
+
   tx.objectStore('photos').add({
-   original,
    edited,
    style:selectedStyle,
    intensity,
+   nightMode,
+   ratio:$('ratioSelect').value,
    date:new Date().toISOString()
   });
+
   tx.oncomplete = resolve;
   tx.onerror = () => reject(tx.error);
  });
+}
+
+function setLastPhoto(blob) {
+ if(lastPhotoUrl) URL.revokeObjectURL(lastPhotoUrl);
+
+ lastPhotoUrl = URL.createObjectURL(blob);
+ $('lastImage').src = lastPhotoUrl;
+ $('lastImage').style.display = 'block';
+}
+
+// TEMPORIZADOR E FOTOGRAFIA
+function wait(ms) {
+ return new Promise(resolve => setTimeout(resolve,ms));
+}
+
+async function runTimer() {
+ let seconds = Number($('timerSelect').value);
+
+ if(seconds <= 0) return;
+
+ const counter = $('countdown');
+ counter.style.display = 'block';
+
+ for(let i=seconds;i>0;i--) {
+  counter.textContent = i;
+  await wait(1000);
+ }
+
+ counter.style.display = 'none';
 }
 
 captureBtn.onclick = async () => {
@@ -316,111 +807,30 @@ captureBtn.onclick = async () => {
  captureBtn.disabled = true;
 
  try {
+  await runTimer();
+
   const original = await capturePhoto();
   const edited = await processPhoto(original);
-  const stamp = new Date().toISOString().replace(/[:.]/g,'-');
 
-  await saveToGallery(edited,'PhotoStudio-'+stamp+'.jpg');
-  await saveToGallery(original,'PhotoStudio-original-'+stamp+'.jpg');
-  await saveLocal(original,edited);
+  const stamp = new Date().toISOString()
+   .replace(/[:.]/g,'-');
+
+  // SALVA SOMENTE A FOTO EDITADA
+  await saveToGallery(
+   edited,
+   'PhotoStudio-'+stamp+'.jpg'
+  );
+
+  await saveLocal(edited);
 
   await renderGallery();
   setLastPhoto(edited);
 
-  toast('Foto original e editada salvas na galeria!');
+  toast('Foto editada salva na galeria!');
 
  } catch(error) {
+  console.error(error);
   toast('Erro ao salvar: '+error.message);
  } finally {
   busy = false;
-  captureBtn.disabled = !stream;
- }
-};
-
-function setLastPhoto(blob) {
- const url = URL.createObjectURL(blob);
- $('lastImage').src = url;
- $('lastImage').style.display = 'block';
-}
-
-function getPhotos() {
- return new Promise((resolve,reject) => {
-  const req = db.transaction('photos','readonly')
-   .objectStore('photos').getAll();
-  req.onsuccess = () => resolve(req.result);
-  req.onerror = () => reject(req.error);
- });
-}
-
-async function renderGallery() {
- const photos = (await getPhotos()).reverse();
- $('gallery').innerHTML = '';
- $('emptyGallery').style.display = photos.length ? 'none' : 'block';
-
- photos.forEach(photo => {
-  const card = document.createElement('div');
-  card.className = 'photo';
-
-  const img = document.createElement('img');
-  img.src = URL.createObjectURL(photo.edited);
-
-  const info = document.createElement('div');
-  info.className = 'photo-info';
-  info.textContent =
-   (photo.style === 'samsung' ? 'Samsung Galaxy S' : 'iPhone')+
-   ' • '+photo.intensity+'%';
-
-  const actions = document.createElement('div');
-  actions.className = 'photo-actions';
-
-  const original = document.createElement('button');
-  original.textContent = 'Ver original';
-  original.onclick = () => showBlob(photo.original);
-
-  const edited = document.createElement('button');
-  edited.textContent = 'Ver editada';
-  edited.onclick = () => showBlob(photo.edited);
-
-  actions.append(original,edited);
-  card.append(img,info,actions);
-  $('gallery').append(card);
- });
-}
-
-function showBlob(blob) {
- const url = URL.createObjectURL(blob);
- const link = document.createElement('a');
- link.href = url;
- link.target = '_blank';
- link.click();
- setTimeout(() => URL.revokeObjectURL(url),30000);
-}
-
-function showPage(id) {
- document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
- $(id).classList.add('active');
-}
-
-$('openGallery').onclick = async () => {
- await renderGallery();
- showPage('galleryPage');
-};
-
-$('lastThumb').onclick = async () => {
- await renderGallery();
- showPage('galleryPage');
-};
-
-$('backBtn').onclick = () => showPage('cameraPage');
-
-await openDB();
-await renderGallery();
-await startCamera();
-
-document.addEventListener('visibilitychange',() => {
- if(document.hidden) stopCamera();
- else if($('cameraPage').classList.contains('active')) startCamera();
-});
-</script>
-</body>
-</html>
+  
