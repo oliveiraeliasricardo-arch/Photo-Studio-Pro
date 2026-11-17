@@ -3,784 +3,424 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101114">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#000000">
 <title>PHOTO STUDIO PRO</title>
-
 <style>
 *{box-sizing:border-box}
-
-body{
- margin:0;
- background:#101114;
- color:white;
- font-family:Arial,sans-serif;
- padding-bottom:85px;
-}
-
-header{
- padding:20px;
- display:flex;
- justify-content:space-between;
- align-items:center;
- border-bottom:1px solid #303037;
-}
-
-.logo{font-size:20px;font-weight:bold}
-.logo span{color:#d5ad70}
-
-main{max-width:650px;margin:auto;padding:18px}
-h2{margin-bottom:5px}
-.sub{color:#999;font-size:13px}
-
-.panel{
- background:#1c1d22;
- padding:16px;
- border-radius:17px;
- margin:20px 0;
-}
-
-.camera-box{
- position:relative;
- background:#000;
- border-radius:13px;
- overflow:hidden;
-}
-
-video{
- width:100%;
- display:block;
- background:#000;
- min-height:220px;
- object-fit:contain;
-}
-
-.camera-label{
- position:absolute;
- top:12px;
- left:12px;
- background:#0009;
- padding:8px 12px;
- border-radius:20px;
- font-size:11px;
-}
-
-/* BOTÃO DISCRETO PARA TROCAR A CÂMERA */
-.camera-switch{
- position:absolute;
- right:12px;
- bottom:12px;
- width:40px;
- height:40px;
- padding:0;
- border-radius:50%;
- background:rgba(20,20,20,.58);
- color:white;
- border:1px solid rgba(255,255,255,.28);
- font-size:21px;
- display:flex;
- align-items:center;
- justify-content:center;
- backdrop-filter:blur(8px);
- -webkit-backdrop-filter:blur(8px);
- cursor:pointer;
- z-index:2;
-}
-
-.camera-switch:active{
- transform:scale(.92);
-}
-
-.controls{
- display:flex;
- gap:9px;
- margin-top:12px;
-}
-
-button{
- border:0;
- border-radius:11px;
- padding:14px;
- font-weight:bold;
- cursor:pointer;
-}
-
-.controls button{flex:1}
-.gold{background:#d5ad70;color:#111}
-.dark{background:#303137;color:white}
-button:disabled{opacity:.4}
-
-.filter-options{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px;
- margin-top:15px;
-}
-
-.filter-option{
- background:#303137;
- color:white;
- padding:15px 8px;
- border:2px solid transparent;
- text-align:center;
-}
-
-.filter-option.active{
- border-color:#d5ad70;
- background:#423b30;
-}
-
-.filter-option strong{
- display:block;
- margin-bottom:6px;
-}
-
-.filter-option small{
- color:#bbb;
- font-size:11px;
- font-weight:normal;
-}
-
-.intensity{margin-top:20px}
-
-.intensity label{
- display:flex;
- justify-content:space-between;
- font-size:13px;
- margin-bottom:10px;
-}
-
-input[type=range]{
- width:100%;
- accent-color:#d5ad70;
-}
-
-.info{
- font-size:12px;
- color:#a9c9ae;
- margin-top:12px;
-}
-
-.grid{
- display:grid;
- grid-template-columns:repeat(2,1fr);
- gap:10px;
- margin-top:20px;
-}
-
-.photo{
- background:#292a30;
- border-radius:12px;
- overflow:hidden;
- position:relative;
-}
-
-.photo img{
- width:100%;
- aspect-ratio:1;
- object-fit:cover;
- display:block;
-}
-
-.photo-info{
- padding:10px;
- font-size:11px;
- color:#ccc;
-}
-
-.photo-actions{
- display:flex;
- gap:5px;
- padding:0 8px 8px;
-}
-
-.photo-actions button{
- flex:1;
- padding:9px 4px;
- font-size:11px;
-}
-
-.page{display:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:white;font-family:Arial,sans-serif}
+button{border:0;color:white;background:transparent;font:inherit;cursor:pointer}
+#app{height:100dvh;width:100%;position:relative;overflow:hidden}
+.page{display:none;position:absolute;inset:0}
 .page.active{display:block}
-
-nav{
- position:fixed;
- bottom:0;
- left:0;
- right:0;
- background:#191a1f;
- border-top:1px solid #333;
- display:flex;
- justify-content:space-around;
- padding:12px;
- z-index:10;
-}
-
-nav button{
- background:none;
- color:#999;
- font-size:11px;
-}
-
-nav button.active{color:#d5ad70}
-nav span{display:block;font-size:21px;margin-bottom:4px}
-
-.empty{
- color:#888;
- text-align:center;
- padding:35px 10px;
-}
+#cameraPage{background:#000}
+#video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#video.mirror{transform:scaleX(-1)}
+.topbar{position:absolute;top:0;left:0;right:0;padding:40px 18px 20px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(#0009,transparent)}
+.brand{font-size:13px;font-weight:bold;letter-spacing:1px}
+.brand b{color:#d5ad70}
+.round{width:42px;height:42px;border-radius:50%;background:#2229;border:1px solid #ffffff55;font-size:20px}
+#status{position:absolute;top:90px;left:50%;transform:translateX(-50%);background:#0009;padding:7px 13px;border-radius:20px;font-size:11px;white-space:nowrap}
+#bottom{position:absolute;bottom:0;left:0;right:0;padding:15px 18px 35px;background:linear-gradient(transparent,#000d)}
+.modes{display:flex;justify-content:center;gap:25px;margin-bottom:15px;font-size:12px}
+.modes span{color:#bbb}
+.modes .active{color:#e8c58d;font-weight:bold}
+.filters{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+.filter{background:#222c;border:1px solid #ffffff55;border-radius:20px;padding:10px 13px;font-size:12px}
+.filter.active{background:#d5ad70;color:#111;font-weight:bold}
+.intensity{display:flex;align-items:center;gap:10px;max-width:270px;margin:0 auto 15px;font-size:10px}
+input[type=range]{width:100%;accent-color:#d5ad70}
+.capture-row{display:grid;grid-template-columns:1fr 76px 1fr;align-items:center;max-width:360px;margin:auto}
+.thumb{width:48px;height:48px;border-radius:9px;border:2px solid white;overflow:hidden;background:#222}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.shutter{width:72px;height:72px;border-radius:50%;border:5px solid white;background:#ffffff44;display:grid;place-items:center;justify-self:center}
+.shutter:after{content:"";width:52px;height:52px;border-radius:50%;background:white}
+.shutter:disabled{opacity:.4}
+.gallery-open{justify-self:end;font-size:11px}
+.gallery-open span{display:block;font-size:25px}
+#galleryPage{background:#101114;overflow:auto;padding:35px 15px}
+.gallery-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.gallery-head h2{font-size:21px}
+.back{font-size:28px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.photo{background:#222;border-radius:12px;overflow:hidden}
+.photo img{width:100%;aspect-ratio:1;object-fit:cover}
+.photo-info{padding:9px;font-size:11px;color:#ccc}
+.photo-actions{display:flex;gap:5px;padding:0 8px 8px}
+.photo-actions button{flex:1;background:#444;border-radius:8px;padding:9px;font-size:11px}
+.empty{text-align:center;color:#999;padding:50px 10px}
+#toast{display:none;position:absolute;bottom:130px;left:50%;transform:translateX(-50%);background:#222;border:1px solid #555;border-radius:20px;padding:12px 16px;font-size:12px;z-index:9;width:max-content;max-width:90%}
 </style>
 </head>
-
 <body>
-
-<header>
- <div class="logo">PHOTO <span>STUDIO PRO</span></div>
- <div style="font-size:11px;color:#d5ad70">PRO CAMERA</div>
-</header>
-
-<main>
+<div id="app">
 
 <section id="cameraPage" class="page active">
-
-<h2>Câmera profissional</h2>
-<p class="sub">Escolha seu estilo e fotografe.</p>
-
-<div class="panel">
-
-<div class="camera-box">
-
 <video id="video" autoplay muted playsinline></video>
 
-<div class="camera-label" id="liveLabel">
-SAMSUNG GALAXY S
+<div class="topbar">
+ <div class="brand">PHOTO <b>STUDIO PRO</b></div>
+ <button class="round" id="switchBtn">↻</button>
 </div>
 
-<!-- BOTÃO DISCRETO DE ALTERNÂNCIA -->
-<button
- class="camera-switch"
- onclick="switchCamera()"
- title="Trocar câmera"
- aria-label="Alternar entre câmera frontal e traseira">
- ↻
-</button>
+<div id="status">Iniciando câmera...</div>
 
-</div>
+<div id="bottom">
+ <div class="modes">
+  <span class="active">FOTO</span>
+  <span>RETRATO</span>
+  <span>VÍDEO</span>
+ </div>
 
-<div class="controls">
-<button class="gold" onclick="startCamera()">Abrir câmera</button>
-<button class="dark" onclick="stopCamera()">Desligar</button>
-</div>
+ <div class="filters">
+  <button class="filter active" data-style="samsung">Samsung Galaxy S</button>
+  <button class="filter" data-style="iphone">iPhone</button>
+ </div>
 
-<p class="info" id="cameraInfo">
-Aguardando câmera.
-</p>
+ <div class="intensity">
+  <span>FILTRO</span>
+  <input id="intensity" type="range" min="0" max="100" value="70">
+  <span id="intensityValue">70%</span>
+ </div>
 
-</div>
-
-<div class="panel">
-
-<h3>Escolha seu filtro</h3>
-
-<div class="filter-options">
-
-<button class="filter-option active"
-onclick="selectStyle('samsung',this)">
-<strong>📱 Samsung Galaxy S</strong>
-<small>Vibrante, HDR e contraste definido</small>
-</button>
-
-<button class="filter-option"
-onclick="selectStyle('iphone',this)">
-<strong>🍎 iPhone</strong>
-<small>Natural, equilibrado e suave</small>
-</button>
-
-</div>
-
-<div class="intensity">
-<label>
-Intensidade do filtro
-<span id="intensityValue">70%</span>
-</label>
-
-<input
-type="range"
-id="intensity"
-min="0"
-max="100"
-value="70"
-oninput="applyLiveFilter()">
-</div>
-
-<div class="info">
-O filtro selecionado será aplicado à fotografia antes de ela ser salva.
-</div>
-
-<div class="controls">
-<button class="gold"
-id="captureBtn"
-onclick="takePhoto()"
-disabled>
-◉ FOTOGRAFAR
-</button>
-</div>
-
+ <div class="capture-row">
+  <button class="thumb" id="lastThumb">
+   <img id="lastImage" style="display:none" alt="Última foto">
+  </button>
+  <button class="shutter" id="captureBtn" disabled aria-label="Fotografar"></button>
+  <button class="gallery-open" id="openGallery">
+   <span>▦</span>GALERIA
+  </button>
+ </div>
 </div>
 </section>
 
 <section id="galleryPage" class="page">
-
-<h2>Minha galeria</h2>
-<p class="sub">Suas fotografias salvas automaticamente.</p>
-
-<div id="gallery" class="grid"></div>
-
-<div id="emptyGallery" class="empty">
-📷<br><br>
-Suas fotografias aparecerão aqui.
-</div>
-
+ <div class="gallery-head">
+  <button class="back" id="backBtn">‹</button>
+  <h2>Minha galeria</h2>
+  <span></span>
+ </div>
+ <div id="gallery" class="grid"></div>
+ <div id="emptyGallery" class="empty">Suas fotos aparecerão aqui.</div>
 </section>
 
-</main>
+<div id="toast"></div>
+</div>
 
-<nav>
-<button class="active" onclick="showPage('cameraPage',this)">
-<span>📷</span>Câmera
-</button>
+<script type="module">
+import { registerPlugin } from '@capacitor/core';
 
-<button onclick="showPage('galleryPage',this)">
-<span>▦</span>Galeria
-</button>
-</nav>
+const GallerySaver = registerPlugin('GallerySaver');
 
-<script>
+const $ = id => document.getElementById(id);
+const video = $('video');
+const captureBtn = $('captureBtn');
 
-// ELEMENTOS DA PÁGINA
-const video = document.getElementById("video");
-const captureBtn = document.getElementById("captureBtn");
-const cameraInfo = document.getElementById("cameraInfo");
-const liveLabel = document.getElementById("liveLabel");
-const gallery = document.getElementById("gallery");
-const emptyGallery = document.getElementById("emptyGallery");
-const intensityValue = document.getElementById("intensityValue");
-
-// BANCO DE DADOS
-let db;
-
-const openDB = indexedDB.open("PhotoStudioProDB",1);
-
-openDB.onupgradeneeded = e => {
- const database = e.target.result;
- database.createObjectStore("photos",{
-  keyPath:"id",
-  autoIncrement:true
- });
-};
-
-openDB.onsuccess = e => {
- db = e.target.result;
- loadGallery();
-};
-
-openDB.onerror = () => {
- alert("Erro ao iniciar a galeria.");
-};
-
-// VARIÁVEIS
 let stream = null;
-let facing = "environment";
-let selectedStyle = "samsung";
+let facing = 'environment';
+let selectedStyle = 'samsung';
 let intensity = 70;
+let db = null;
 let busy = false;
 
-// CÂMERA
-async function startCamera(){
+function toast(message) {
+ const el = $('toast');
+ el.textContent = message;
+ el.style.display = 'block';
+ clearTimeout(toast.timer);
+ toast.timer = setTimeout(() => el.style.display = 'none', 2800);
+}
 
- try{
-
- if(!navigator.mediaDevices?.getUserMedia){
-  throw new Error("A câmera exige HTTPS e um navegador compatível.");
- }
-
- stopCamera();
-
- stream = await navigator.mediaDevices.getUserMedia({
-  audio:false,
-  video:{
-   facingMode:{ideal:facing},
-   width:{ideal:3840},
-   height:{ideal:2160},
-   frameRate:{ideal:30,max:60}
-  }
+function openDB() {
+ return new Promise((resolve,reject) => {
+  const req = indexedDB.open('PhotoStudioProDB',1);
+  req.onupgradeneeded = e => {
+   e.target.result.createObjectStore('photos',{
+    keyPath:'id',autoIncrement:true
+   });
+  };
+  req.onsuccess = () => {
+   db = req.result;
+   resolve();
+  };
+  req.onerror = () => reject(req.error);
  });
-
- video.srcObject = stream;
- await video.play();
-
- captureBtn.disabled = false;
-
- const settings = stream.getVideoTracks()[0].getSettings();
-
- cameraInfo.textContent =
- "Resolução disponível: "+
- (settings.width||"?")+" × "+(settings.height||"?");
-
- applyLiveFilter();
-
- }catch(error){
-
- cameraInfo.textContent = "Não foi possível abrir a câmera.";
- alert("Não foi possível abrir a câmera. Verifique as permissões e utilize HTTPS.");
-
- }
-
 }
 
-function stopCamera(){
+async function startCamera() {
+ try {
+  stopCamera();
 
- if(stream){
-  stream.getTracks().forEach(track=>track.stop());
-  stream=null;
+  stream = await navigator.mediaDevices.getUserMedia({
+   audio:false,
+   video:{
+    facingMode:{ideal:facing},
+    width:{ideal:1920},
+    height:{ideal:1080}
+   }
+  });
+
+  video.srcObject = stream;
+  await video.play();
+  video.classList.toggle('mirror',facing === 'user');
+  captureBtn.disabled = false;
+  $('status').textContent =
+   facing === 'user' ? 'Câmera frontal' : 'Câmera traseira';
+
+  applyLiveFilter();
+
+ } catch(error) {
+  $('status').textContent = 'Erro ao abrir câmera';
+  toast('Verifique a permissão da câmera.');
  }
-
- video.srcObject=null;
- captureBtn.disabled=true;
-
 }
 
-// TROCA ENTRE CÂMERA FRONTAL E TRASEIRA
-async function switchCamera(){
-
- const previousFacing = facing;
-
- facing = facing === "environment" ? "user" : "environment";
-
- if(stream){
-  await startCamera();
-
-  if(!stream){
-   facing = previousFacing;
-  }
- }else{
-  cameraInfo.textContent =
-   facing === "user"
-   ? "Câmera frontal selecionada. Toque em Abrir câmera."
-   : "Câmera traseira selecionada. Toque em Abrir câmera.";
+function stopCamera() {
+ if(stream) {
+  stream.getTracks().forEach(track => track.stop());
+  stream = null;
  }
-
+ video.srcObject = null;
+ captureBtn.disabled = true;
 }
 
-// FILTROS
-function selectStyle(style,button){
+$('switchBtn').onclick = async () => {
+ facing = facing === 'environment' ? 'user' : 'environment';
+ await startCamera();
+};
 
- selectedStyle = style;
+function filterValues() {
+ const amount = intensity / 100;
+ const values = selectedStyle === 'samsung'
+  ? [1.04,1.16,1.20]
+  : [1.03,1.06,1.07];
 
- document.querySelectorAll(".filter-option")
- .forEach(b=>b.classList.remove("active"));
-
- button.classList.add("active");
-
- applyLiveFilter();
+ return values.map(v => 1 + (v-1)*amount);
 }
 
-// FILTRO EM TEMPO REAL
-function applyLiveFilter(){
-
- intensity = Number(document.getElementById("intensity").value);
-
- intensityValue.textContent = intensity+"%";
-
- const amount = intensity/100;
-
- let b,c,s;
-
- if(selectedStyle==="samsung"){
-
-  b=1.04;
-  c=1.16;
-  s=1.20;
-
-  liveLabel.textContent="SAMSUNG GALAXY S";
-
- }else{
-
-  b=1.03;
-  c=1.06;
-  s=1.07;
-
-  liveLabel.textContent="IPHONE STYLE";
-
- }
-
- const brightness = 1+(b-1)*amount;
- const contrast = 1+(c-1)*amount;
- const saturation = 1+(s-1)*amount;
+function applyLiveFilter() {
+ intensity = Number($('intensity').value);
+ $('intensityValue').textContent = intensity + '%';
+ const [b,c,s] = filterValues();
 
  video.style.filter =
- `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`;
-
+  `brightness(${b}) contrast(${c}) saturate(${s})`;
 }
 
-// CAPTURA ORIGINAL
-async function captureOriginal(){
+$('intensity').oninput = applyLiveFilter;
 
- const track = stream.getVideoTracks()[0];
+document.querySelectorAll('.filter').forEach(button => {
+ button.onclick = () => {
+  document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
+  button.classList.add('active');
+  selectedStyle = button.dataset.style;
+  applyLiveFilter();
+ };
+});
 
- if("ImageCapture" in window){
-
-  try{
-   const imageCapture = new ImageCapture(track);
-   return await imageCapture.takePhoto();
-  }catch(error){
-   console.log("Utilizando captura alternativa.");
-  }
-
- }
-
- const canvas = document.createElement("canvas");
-
+function capturePhoto() {
+ const canvas = document.createElement('canvas');
  canvas.width = video.videoWidth;
  canvas.height = video.videoHeight;
 
- canvas.getContext("2d").drawImage(
-  video,0,0,canvas.width,canvas.height
- );
+ const ctx = canvas.getContext('2d');
 
- return new Promise(resolve=>{
-  canvas.toBlob(resolve,"image/jpeg",0.98);
- });
-
-}
-
-// APLICA FILTRO NA FOTO
-function processPhoto(blob){
-
- return new Promise((resolve,reject)=>{
-
-  const url = URL.createObjectURL(blob);
-  const img = new Image();
-
-  img.onload = ()=>{
-
-   const canvas = document.createElement("canvas");
-
-   canvas.width = img.naturalWidth;
-   canvas.height = img.naturalHeight;
-
-   const ctx = canvas.getContext("2d");
-
-   const amount = intensity/100;
-
-   let b,c,s;
-
-   if(selectedStyle==="samsung"){
-    b=1.04;
-    c=1.16;
-    s=1.20;
-   }else{
-    b=1.03;
-    c=1.06;
-    s=1.07;
-   }
-
-   ctx.filter =
-   `brightness(${1+(b-1)*amount}) contrast(${1+(c-1)*amount}) saturate(${1+(s-1)*amount})`;
-
-   ctx.drawImage(img,0,0,canvas.width,canvas.height);
-
-   canvas.toBlob(result=>{
-
-    URL.revokeObjectURL(url);
-
-    if(result)resolve(result);
-    else reject(new Error("Falha ao processar imagem."));
-
-   },"image/jpeg",0.98);
-
-  };
-
-  img.onerror = ()=>{
-   URL.revokeObjectURL(url);
-   reject(new Error("Não foi possível carregar a fotografia."));
-  };
-
-  img.src = url;
-
- });
-
-}
-
-// FOTOGRAFAR E SALVAR
-async function takePhoto(){
-
- if(!stream||busy)return;
-
- busy=true;
- captureBtn.disabled=true;
- captureBtn.textContent="PROCESSANDO...";
-
- try{
-
- const originalBlob = await captureOriginal();
-
- if(!originalBlob)throw new Error("Captura não disponível.");
-
- const filteredBlob = await processPhoto(originalBlob);
-
- const record = {
-  original:originalBlob,
-  edited:filteredBlob,
-  style:selectedStyle,
-  intensity:intensity,
-  date:new Date().toISOString()
- };
-
- await savePhoto(record);
- await loadGallery();
-
- alert("Fotografia salva automaticamente na galeria!");
-
- }catch(error){
-
- alert("Erro ao salvar: "+error.message);
-
- }finally{
-
- busy=false;
- captureBtn.disabled=!stream;
- captureBtn.textContent="◉ FOTOGRAFAR";
-
+ if(facing === 'user') {
+  ctx.translate(canvas.width,0);
+  ctx.scale(-1,1);
  }
 
-}
+ ctx.drawImage(video,0,0,canvas.width,canvas.height);
 
-// SALVAR NO BANCO
-function savePhoto(record){
-
- return new Promise((resolve,reject)=>{
-
-  const tx = db.transaction("photos","readwrite");
-
-  tx.objectStore("photos").add(record);
-
-  tx.oncomplete = ()=>resolve();
-  tx.onerror = ()=>reject(tx.error);
-
+ return new Promise((resolve,reject) => {
+  canvas.toBlob(blob => {
+   if(blob) resolve(blob);
+   else reject(new Error('Falha na captura.'));
+  },'image/jpeg',0.96);
  });
-
 }
 
-// BUSCAR FOTOS
-async function getPhotos(){
-
- return new Promise((resolve,reject)=>{
-
-  const req = db.transaction("photos","readonly")
-  .objectStore("photos").getAll();
-
-  req.onsuccess = ()=>resolve(req.result);
-  req.onerror = ()=>reject(req.error);
-
- });
-
-}
-
-// GALERIA
-async function loadGallery(){
-
- if(!db)return;
-
- const photos = await getPhotos();
-
- gallery.innerHTML = "";
-
- emptyGallery.style.display =
- photos.length ? "none" : "block";
-
- photos.reverse().forEach(photo=>{
-
-  const url = URL.createObjectURL(photo.edited);
-
-  const card = document.createElement("div");
-  card.className = "photo";
-
-  const img = document.createElement("img");
-  img.src = url;
-
-  const info = document.createElement("div");
-  info.className = "photo-info";
-
-  info.textContent =
-   (photo.style==="samsung"?"Samsung Galaxy S":"iPhone")+
-   " • "+photo.intensity+"%";
-
-  const actions = document.createElement("div");
-  actions.className = "photo-actions";
-
-  const download = document.createElement("button");
-  download.className = "gold";
-  download.textContent = "Salvar";
-
-  download.onclick = ()=>{
-   downloadBlob(photo.edited,"Foto-editada.jpg");
-  };
-
-  const original = document.createElement("button");
-  original.className = "dark";
-  original.textContent = "Original";
-
-  original.onclick = ()=>{
-   downloadBlob(photo.original,"Foto-original.jpg");
-  };
-
-  actions.append(download,original);
-  card.append(img,info,actions);
-
-  gallery.appendChild(card);
-
- });
-
-}
-
-// BAIXAR FOTOS
-function downloadBlob(blob,name){
-
+async function processPhoto(blob) {
  const url = URL.createObjectURL(blob);
- const a = document.createElement("a");
 
- a.href = url;
- a.download = name;
+ try {
+  const img = new Image();
+  img.src = url;
+  await img.decode();
 
- document.body.appendChild(a);
- a.click();
- a.remove();
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
 
- setTimeout(()=>URL.revokeObjectURL(url),5000);
+  const ctx = canvas.getContext('2d');
+  const [b,c,s] = filterValues();
 
+  ctx.filter = `brightness(${b}) contrast(${c}) saturate(${s})`;
+  ctx.drawImage(img,0,0);
+
+  return await new Promise((resolve,reject) => {
+   canvas.toBlob(result => {
+    if(result) resolve(result);
+    else reject(new Error('Falha no filtro.'));
+   },'image/jpeg',0.96);
+  });
+
+ } finally {
+  URL.revokeObjectURL(url);
+ }
 }
 
-// NAVEGAÇÃO
-function showPage(id,button){
-
- document.querySelectorAll(".page")
- .forEach(p=>p.classList.remove("active"));
-
- document.getElementById(id).classList.add("active");
-
- document.querySelectorAll("nav button")
- .forEach(b=>b.classList.remove("active"));
-
- button.classList.add("active");
-
- if(id==="galleryPage")loadGallery();
-
+function blobToBase64(blob) {
+ return new Promise((resolve,reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(String(reader.result).split(',')[1]);
+  reader.onerror = reject;
+  reader.readAsDataURL(blob);
+ });
 }
 
+async function saveToGallery(blob,fileName) {
+ const data = await blobToBase64(blob);
+
+ const result = await GallerySaver.save({
+  data,
+  fileName,
+  mimeType:'image/jpeg'
+ });
+
+ if(!result || !result.uri) {
+  throw new Error('O Android não confirmou o salvamento.');
+ }
+}
+
+function saveLocal(original,edited) {
+ return new Promise((resolve,reject) => {
+  const tx = db.transaction('photos','readwrite');
+  tx.objectStore('photos').add({
+   original,
+   edited,
+   style:selectedStyle,
+   intensity,
+   date:new Date().toISOString()
+  });
+  tx.oncomplete = resolve;
+  tx.onerror = () => reject(tx.error);
+ });
+}
+
+captureBtn.onclick = async () => {
+ if(!stream || busy) return;
+
+ busy = true;
+ captureBtn.disabled = true;
+
+ try {
+  const original = await capturePhoto();
+  const edited = await processPhoto(original);
+  const stamp = new Date().toISOString().replace(/[:.]/g,'-');
+
+  await saveToGallery(edited,'PhotoStudio-'+stamp+'.jpg');
+  await saveToGallery(original,'PhotoStudio-original-'+stamp+'.jpg');
+  await saveLocal(original,edited);
+
+  await renderGallery();
+  setLastPhoto(edited);
+
+  toast('Foto original e editada salvas na galeria!');
+
+ } catch(error) {
+  toast('Erro ao salvar: '+error.message);
+ } finally {
+  busy = false;
+  captureBtn.disabled = !stream;
+ }
+};
+
+function setLastPhoto(blob) {
+ const url = URL.createObjectURL(blob);
+ $('lastImage').src = url;
+ $('lastImage').style.display = 'block';
+}
+
+function getPhotos() {
+ return new Promise((resolve,reject) => {
+  const req = db.transaction('photos','readonly')
+   .objectStore('photos').getAll();
+  req.onsuccess = () => resolve(req.result);
+  req.onerror = () => reject(req.error);
+ });
+}
+
+async function renderGallery() {
+ const photos = (await getPhotos()).reverse();
+ $('gallery').innerHTML = '';
+ $('emptyGallery').style.display = photos.length ? 'none' : 'block';
+
+ photos.forEach(photo => {
+  const card = document.createElement('div');
+  card.className = 'photo';
+
+  const img = document.createElement('img');
+  img.src = URL.createObjectURL(photo.edited);
+
+  const info = document.createElement('div');
+  info.className = 'photo-info';
+  info.textContent =
+   (photo.style === 'samsung' ? 'Samsung Galaxy S' : 'iPhone')+
+   ' • '+photo.intensity+'%';
+
+  const actions = document.createElement('div');
+  actions.className = 'photo-actions';
+
+  const original = document.createElement('button');
+  original.textContent = 'Ver original';
+  original.onclick = () => showBlob(photo.original);
+
+  const edited = document.createElement('button');
+  edited.textContent = 'Ver editada';
+  edited.onclick = () => showBlob(photo.edited);
+
+  actions.append(original,edited);
+  card.append(img,info,actions);
+  $('gallery').append(card);
+ });
+}
+
+function showBlob(blob) {
+ const url = URL.createObjectURL(blob);
+ const link = document.createElement('a');
+ link.href = url;
+ link.target = '_blank';
+ link.click();
+ setTimeout(() => URL.revokeObjectURL(url),30000);
+}
+
+function showPage(id) {
+ document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+ $(id).classList.add('active');
+}
+
+$('openGallery').onclick = async () => {
+ await renderGallery();
+ showPage('galleryPage');
+};
+
+$('lastThumb').onclick = async () => {
+ await renderGallery();
+ showPage('galleryPage');
+};
+
+$('backBtn').onclick = () => showPage('cameraPage');
+
+await openDB();
+await renderGallery();
+await startCamera();
+
+document.addEventListener('visibilitychange',() => {
+ if(document.hidden) stopCamera();
+ else if($('cameraPage').classList.contains('active')) startCamera();
+});
 </script>
-
 </body>
-  </html>
-  
+</html>
