@@ -1,5 +1,10 @@
+
 {
   "appId": "com.photostudio.pro",
   "appName": "PHOTO STUDIO PRO",
-  "webDir": "www"
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "hostname": "localhost"
+  }
 }
