@@ -1,21 +1,21 @@
 
-name: Build PHOTO STUDIO PRO APK
+name: Build PHOTO STUDIO PRO
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Baixar projeto
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js
+      - name: Configurar Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -29,32 +29,31 @@ jobs:
       - name: Instalar dependências
         run: npm install
 
-      - name: Preparar Android
+      - name: Compilar interface
+        run: npm run build
+
+      - name: Adicionar Android
         run: npx cap add android
 
-      - name: Instalar arquivos nativos
+      - name: Copiar plugins personalizados
         run: |
-          cp android-patch/app/src/main/java/com/photostudio/pro/*.java \
-          android/app/src/main/java/com/photostudio/pro/
+          mkdir -p android/app/src/main/java/com/photostudio/pro
+          cp android-patch/app/src/main/java/com/photostudio/pro/*.java android/app/src/main/java/com/photostudio/pro/
 
-      - name: Declarar permissões
+      - name: Adicionar permissão da câmera
         run: |
-          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n</manifest>#' \
-          android/app/src/main/AndroidManifest.xml
+          sed -i '/<application/i\    <uses-permission android:name="android.permission.CAMERA" />' android/app/src/main/AndroidManifest.xml
 
       - name: Sincronizar Capacitor
         run: npx cap sync android
 
       - name: Gerar APK
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+        working-directory: android
+        run: ./gradlew assembleDebug
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
-          name: PHOTO-STUDIO-PRO-APK
+          name: PHOTO-STUDIO-PRO
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
           
