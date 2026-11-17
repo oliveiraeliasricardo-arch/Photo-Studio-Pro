@@ -13,16 +13,15 @@ jobs:
 
     steps:
       - name: Baixar projeto
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
-          package-manager-cache: false
+          node-version: 20
 
       - name: Configurar Java
-        uses: actions/setup-java@v6
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -33,9 +32,15 @@ jobs:
       - name: Preparar Android
         run: npx cap add android
 
-      - name: Declarar permissão da câmera
+      - name: Instalar arquivos nativos
         run: |
-          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n</manifest>#' android/app/src/main/AndroidManifest.xml
+          cp android-patch/app/src/main/java/com/photostudio/pro/*.java \
+          android/app/src/main/java/com/photostudio/pro/
+
+      - name: Declarar permissões
+        run: |
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n</manifest>#' \
+          android/app/src/main/AndroidManifest.xml
 
       - name: Sincronizar Capacitor
         run: npx cap sync android
@@ -47,8 +52,9 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Disponibilizar APK
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: PHOTO-STUDIO-PRO-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
           
